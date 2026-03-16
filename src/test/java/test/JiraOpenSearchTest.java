@@ -58,10 +58,11 @@ class JiraOpenSearchTest {
 
         final var statefulSet = resources.getStatefulSet(JIRA.getHelmReleaseName());
         final var env = statefulSet.getContainer().getEnv();
-        env.assertHasValue("ATL_SEARCH_PLATFORM", "opensearch");
-        env.assertHasValue("ATL_OPENSEARCH_HTTP_URL", "http://opensearch-cluster-master:9200");
-        env.assertHasValue("ATL_OPENSEARCH_USERNAME", "admin");
-        env.assertHasSecretRef("ATL_OPENSEARCH_PASSWORD", "opensearch-initial-password", "OPENSEARCH_INITIAL_ADMIN_PASSWORD");
+        env.assertHasValue("ADDITIONAL_JIRA_CONFIG_SEARCH_PLATFORM", "search.platform=opensearch");
+        env.assertHasValue("ADDITIONAL_JIRA_CONFIG_SEARCH_URL", "opensearch.http.url=http://opensearch-cluster-master:9200");
+        env.assertHasValue("ADDITIONAL_JIRA_CONFIG_SEARCH_USERNAME", "opensearch.username=admin");
+        env.assertHasSecretRef("OPENSEARCH_INITIAL_ADMIN_PASSWORD", "opensearch-initial-password", "OPENSEARCH_INITIAL_ADMIN_PASSWORD");
+        env.assertHasValue("ADDITIONAL_JIRA_CONFIG_SEARCH_PASSWORD__EXPAND_ENV", "opensearch.password={OPENSEARCH_INITIAL_ADMIN_PASSWORD}");
     }
 
     @Test
@@ -73,6 +74,6 @@ class JiraOpenSearchTest {
 
         final var statefulSet = resources.getStatefulSet(JIRA.getHelmReleaseName());
         final var env = statefulSet.getContainer().getEnv();
-        env.assertHasSecretRef("ATL_OPENSEARCH_PASSWORD", "my-opensearch-secret", "OPENSEARCH_INITIAL_ADMIN_PASSWORD");
+        env.assertHasSecretRef("OPENSEARCH_INITIAL_ADMIN_PASSWORD", "my-opensearch-secret", "OPENSEARCH_INITIAL_ADMIN_PASSWORD");
     }
 }

@@ -570,16 +570,18 @@ set -e; cp $JAVA_HOME/lib/security/cacerts /var/ssl/cacerts; chmod 664 /var/ssl/
 
 {{- define "opensearch.env.vars" }}
 {{- if .Values.opensearch.enabled }}
-- name: ATL_SEARCH_PLATFORM
-  value: opensearch
-- name: ATL_OPENSEARCH_HTTP_URL
-  value: http://opensearch-cluster-master:9200
-- name: ATL_OPENSEARCH_USERNAME
-  value: admin
-- name: ATL_OPENSEARCH_PASSWORD
+- name: ADDITIONAL_JIRA_CONFIG_SEARCH_PLATFORM
+  value: "search.platform=opensearch"
+- name: ADDITIONAL_JIRA_CONFIG_SEARCH_URL
+  value: "opensearch.http.url=http://opensearch-cluster-master:9200"
+- name: ADDITIONAL_JIRA_CONFIG_SEARCH_USERNAME
+  value: "opensearch.username=admin"
+- name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.opensearch.credentials.existingSecretRef.name | default "opensearch-initial-password" }}
       key: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+- name: ADDITIONAL_JIRA_CONFIG_SEARCH_PASSWORD__EXPAND_ENV
+  value: "opensearch.password={OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
 {{- end }}
 {{- end }}

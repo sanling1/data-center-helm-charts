@@ -23,7 +23,7 @@ This will:
 
 * auto-generate the initial OpenSearch admin password and create a Kubernetes secret with `OPENSEARCH_INITIAL_ADMIN_PASSWORD` key
 * deploy [OpenSearch Helm chart](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch){.external} to the target namespace with the default settings: single node, 1Gi memory/1 vCPU resources requests, 10Gi storage request
-* configure Jira to use the deployed OpenSearch cluster by setting `ATL_SEARCH_PLATFORM=opensearch`, `ATL_OPENSEARCH_HTTP_URL=http://opensearch-cluster-master:9200`, `ATL_OPENSEARCH_USERNAME=admin` and `ATL_OPENSEARCH_PASSWORD` environment variables on the Jira container
+* configure Jira to use the deployed OpenSearch cluster by setting opensearch properties, which are written to `jira-config.properties` at startup. The following properties are configured: `search.platform=opensearch`, `opensearch.http.url=http://opensearch-cluster-master:9200`, `opensearch.username=admin`, and `opensearch.password`.
 
 ## Override OpenSearch Helm chart values
 
