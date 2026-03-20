@@ -1,29 +1,16 @@
 package test.postinstall;
 
-import io.fabric8.kubernetes.api.model.ContainerStatus;
-import io.fabric8.kubernetes.api.model.Node;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.apps.StatefulSet;
-import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetrics;
-import io.vavr.collection.Array;
-import io.vavr.collection.Map;
-import io.vavr.control.Option;
-import org.assertj.core.description.Description;
-import org.assertj.core.description.LazyTextDescription;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import test.model.Product;
 
-import java.lang.annotation.Repeatable;
-import java.util.function.Consumer;
-
-import static io.restassured.RestAssured.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assumptions.assumeThat;
-import static org.hamcrest.Matchers.*;
+import static io.restassured.RestAssured.when;
+import static java.lang.Thread.sleep;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 import static test.postinstall.Utils.*;
 
 @EnabledIf("isOSDeployed")
@@ -41,7 +28,7 @@ class OpenSearchInstallTest {
 
         // See helm_install.sh for where this host is generated.
         final var ingressDomain = getIngressDomain(client.getClusterType());
-        osIngressBase = "https://" + getRelease() + "-opensearch-cluster-master-0."+ingressDomain;
+        osIngressBase = "https://" + getRelease() + "-opensearch-cluster-master-0." + ingressDomain;
     }
 
     @Test
@@ -56,7 +43,7 @@ class OpenSearchInstallTest {
     }
 
     @Test
-    void openSearchBeingUsed() {
+    void openSearchBeingUsed() throws InterruptedException {
         int retries = 120; // It might take a little while to propagate.
         while (retries > 0) {
             try {
@@ -64,21 +51,29 @@ class OpenSearchInstallTest {
                 // If this changes an alternative would be to use the fabric8 client ExecWatch/ExecListener to
                 // invoke curl from a pod.
                 final var indexURL = osIngressBase + "/_cat/indices?format=json";
+
                 if (productIs(Product.bitbucket)) {
                     when().get(indexURL).then()
                             .body("findAll { it.index == 'bitbucket-index-version' }[0]", hasEntry("docs.count", "1"));
+
                 } else if (productIs(Product.jira)) {
+                    // expecting issues index like jira-issues-20260320135736
                     when().get(indexURL).then()
-                            .body("findAll { it.index =~ /jira.*/ }.size()", greaterThan(0));
+                            .body("findAll { it.index =~ /jira-issues-.*/ }[0]", hasEntry("docs.count", not(equalTo("0"))));
+
+                } else {
+                    fail("Unknown product: " + getProduct());
                 }
+
+                // test passed
+                return;
             } catch (Exception e) {
                 retries--;
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception _e) {
+                if (retries <= 0) {
+                    fail("Open search did not become ready in time.", e);
                 }
+                sleep(1000);
             }
-            return;
         }
     }
 
