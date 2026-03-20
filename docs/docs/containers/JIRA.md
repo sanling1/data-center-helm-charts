@@ -554,8 +554,10 @@ Additional properties can be injected into `jira-config.properties` using
 environment variables prefixed with `ADDITIONAL_JIRA_CONFIG_`.
 
 Each variable's value must be a complete property line in `key=value` format.
-Properties are sorted by environment variable name, so numbering used below controls
-the order in the generated file.
+Environment variable names are sorted for consistent file generation; order has
+no effect on runtime behavior.
+
+#### Using Docker
 
 ```bash
 docker run \
@@ -563,6 +565,35 @@ docker run \
   -e ADDITIONAL_JIRA_CONFIG_02="jira.lf.top.bgcolour=#003366" \
   atlassian/jira-software:latest
 ```
+
+#### Using the Helm chart
+
+The Helm chart provides dedicated values for this feature so you don't need to
+construct the environment variable names manually:
+
+```yaml
+jira:
+  additionalConfigProperties:
+    - "jira.websudo.is.disabled=true"
+    - "jira.lf.top.bgcolour=#003366"
+
+  additionalConfigPropertiesExpandEnv:
+    - "opensearch.password={OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
+```
+
+These are equivalent to setting `ADDITIONAL_JIRA_CONFIG_*` environment
+variables directly. The values can also be set via `--set`:
+
+```bash
+helm install jira atlassian-data-center/jira \
+  --set 'jira.additionalConfigProperties[0]=jira.websudo.is.disabled=true'
+```
+
+Alternatively, you can use `jira.additionalEnvironmentVariables` to pass the
+`ADDITIONAL_JIRA_CONFIG_*` environment variables explicitly if you need full
+control over naming.
+
+#### How properties are written
 
 The properties are written to a clearly marked auto-generated section at the end
 of the file. Any manually added content outside this section is preserved across
@@ -615,6 +646,16 @@ unchanged and a warning is logged.
   marked comment boundaries at the end of the file. Manual edits outside these
   markers are preserved. Do not edit content within the markers — it will be
   overwritten on the next container startup.
+
+| Aspect | Detail |
+|---|---|
+| Env var prefix | `ADDITIONAL_JIRA_CONFIG_` |
+| Secret expansion suffix | `__EXPAND_ENV` (double underscore) |
+| Target file | `$JIRA_HOME/jira-config.properties` |
+| Helm values | `jira.additionalConfigProperties`, `jira.additionalConfigPropertiesExpandEnv` |
+| Ordering | Sorted for reproducibility; order has no effect on behavior |
+| Existing content | Preserved (only auto-generated section is replaced) |
+| No matching env vars | File is not created; stale section is removed if present |
 
 ### Advanced Configuration
 

@@ -188,6 +188,7 @@ spec:
               value: {{ include "common.jmx.javaagent" . | replace "\n" "" | quote }}
             {{- end }}
             {{- include "opensearch.env.vars" . | nindent 12 }}
+            {{- include "jira.additionalConfigProperties" . | nindent 12 }}
             {{- include "jira.additionalEnvironmentVariables" . | nindent 12 }}
           ports:
             - name: http

@@ -290,6 +290,20 @@ Define additional environment variables here to allow template overrides when us
 {{- end }}
 
 {{/*
+Renders ADDITIONAL_JIRA_CONFIG_* environment variables from additionalConfigProperties values
+*/}}
+{{- define "jira.additionalConfigProperties" -}}
+{{- range $index, $prop := .Values.jira.additionalConfigProperties }}
+- name: {{ printf "ADDITIONAL_JIRA_CONFIG_HELM_%03d" $index }}
+  value: {{ $prop | quote }}
+{{- end }}
+{{- range $index, $prop := .Values.jira.additionalConfigPropertiesExpandEnv }}
+- name: {{ printf "ADDITIONAL_JIRA_CONFIG_HELM_%03d__EXPAND_ENV" $index }}
+  value: {{ $prop | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 For each additional library declared, generate a volume mount that injects that library into the Jira lib directory
 */}}
 {{- define "jira.additionalLibraries" -}}

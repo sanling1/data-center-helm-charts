@@ -907,6 +907,25 @@ jira:
   #
   additionalVolumeMounts: []
 
+  # -- Additional properties to inject into jira-config.properties at container
+  # startup via ADDITIONAL_JIRA_CONFIG_* environment variables.
+  # Each entry is a "key=value" property line. Environment variable names are
+  # sorted for consistent file generation; order has no effect on runtime behavior.
+  #
+  # Requires a Jira container image version that supports ADDITIONAL_JIRA_CONFIG_*.
+  #
+  additionalConfigProperties: []
+  #  - "jira.websudo.is.disabled=true"
+  #  - "jira.lf.top.bgcolour=#003366"
+
+  # -- Additional properties requiring environment variable expansion at
+  # container startup. Values containing {VAR_NAME} placeholders will be
+  # replaced with the corresponding environment variable value.
+  # Useful for injecting secrets without hardcoding them in values.
+  #
+  additionalConfigPropertiesExpandEnv: []
+  #  - "opensearch.password={OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
+
   # -- Defines any additional environment variables to be passed to the Jira
   # container. See https://hub.docker.com/r/atlassian/jira-software for
   # supported variables.
