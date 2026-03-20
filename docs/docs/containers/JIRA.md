@@ -543,6 +543,79 @@ as a non-root user.
 
   The default Tomcat session timeout (in minutes) for all newly created sessions which is set in web.xml. Defaults to 30.
 
+### Custom `jira-config.properties`
+
+!!! info "Container image support"
+    This feature requires a Jira container image version that supports the
+    `ADDITIONAL_JIRA_CONFIG_*` environment variables. Check the image release
+    notes to confirm availability (supported since <TODO>).
+
+Additional properties can be injected into `jira-config.properties` using
+environment variables prefixed with `ADDITIONAL_JIRA_CONFIG_`.
+
+Each variable's value must be a complete property line in `key=value` format.
+Properties are sorted by environment variable name, so numbering used below controls
+the order in the generated file.
+
+```bash
+docker run \
+  -e ADDITIONAL_JIRA_CONFIG_01="jira.websudo.is.disabled=true" \
+  -e ADDITIONAL_JIRA_CONFIG_02="jira.lf.top.bgcolour=#003366" \
+  atlassian/jira-software:latest
+```
+
+The properties are written to a clearly marked auto-generated section at the end
+of the file. Any manually added content outside this section is preserved across
+container restarts.
+
+#### Injecting secrets via `__EXPAND_ENV`
+
+For values that reference secrets stored in separate environment variables
+(common in Kubernetes where secrets are mounted as env vars), use the
+`__EXPAND_ENV` suffix. Placeholders in `{VAR_NAME}` format are replaced with
+the corresponding environment variable value at startup:
+
+```bash
+docker run \
+  -e OPENSEARCH_INITIAL_ADMIN_PASSWORD=my-secret \
+  -e ADDITIONAL_JIRA_CONFIG_01="opensearch.enabled=true" \
+  -e ADDITIONAL_JIRA_CONFIG_02__EXPAND_ENV="opensearch.password={OPENSEARCH_INITIAL_ADMIN_PASSWORD}" \
+  atlassian/jira-software:latest
+```
+
+This generates the following in `jira-config.properties`:
+
+```properties
+# ---- AUTO GENERATED ADDITIONAL PROPERTIES FROM DOCKER IMAGE ---
+# DO NOT MODIFY this section - it is auto-generated during container startup
+# from ADDITIONAL_JIRA_CONFIG_* environment variables
+opensearch.enabled=true
+opensearch.password=my-secret
+# ---- END OF AUTO GENERATED ADDITIONAL PROPERTIES ---
+```
+
+If a referenced environment variable is not set, the placeholder is left
+unchanged and a warning is logged.
+
+#### Limitations and requirements
+
+* **Local home directory only**: `jira-config.properties` is written to
+  `$JIRA_HOME` which must be the node-local home directory (not shared storage).
+  Using `ADDITIONAL_JIRA_CONFIG_*` when `jira-config.properties` is stored on a
+  shared filesystem (e.g. NFS, EFS) may cause unexpected outcomes due to update
+  races across different container instances during rolling deployments.
+
+* **Read-only mounts not supported**: If `jira-config.properties` is mounted as
+  a read-only file (e.g. via a Kubernetes ConfigMap volume mount), the
+  `ADDITIONAL_JIRA_CONFIG_*` variables will have no effect. A warning is logged
+  in this case. Manage the file content entirely through the mount instead — do
+  not combine both approaches.
+
+* **Auto-generated section**: The generated properties are placed inside clearly
+  marked comment boundaries at the end of the file. Manual edits outside these
+  markers are preserved. Do not edit content within the markers — it will be
+  overwritten on the next container startup.
+
 ### Advanced Configuration
 
 As mentioned at the top of this section, the settings from the environment are
