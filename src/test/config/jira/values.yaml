@@ -1,5 +1,8 @@
 # This file contains overrides for the Jira Helm chart's values.yaml file
 
+image:
+  pullPolicy: Always
+
 jira:
   clustering:
     enabled: ${clustering.enabled}
