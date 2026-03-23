@@ -541,6 +541,8 @@ verify_opensearch() {
         echo "[INFO]: OpenSearch verification passed for Jira: jira-issues index exists (docs.count=${DOC_COUNT})"
         return 0
       fi
+      echo "[INFO]: Waiting for Jira to create index in OpenSearch... (${i}/${RETRIES})"
+    fi
 
     sleep ${SLEEP_INTERVAL}
   done
