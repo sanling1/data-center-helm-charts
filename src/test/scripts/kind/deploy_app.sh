@@ -547,6 +547,8 @@ verify_opensearch() {
   done
 
   echo "[ERROR]: OpenSearch verification failed for ${DC_APP} after $((RETRIES * SLEEP_INTERVAL)) seconds"
+  echo "[DEBUG]: Docker images used by ${DC_APP} pods:"
+  kubectl get pods -n atlassian -l app.kubernetes.io/name=${DC_APP} -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{range .status.containerStatuses[*]}  Container: {.name}{"\n"}  Image: {.image}{"\n"}  ImageID: {.imageID}{"\n"}{end}{range .status.initContainerStatuses[*]}  InitContainer: {.name}{"\n"}  Image: {.image}{"\n"}  ImageID: {.imageID}{"\n"}{end}{"\n"}{end}' 2>/dev/null || true
   echo "[DEBUG]: OpenSearch indices:"
   kubectl exec -n atlassian ${OS_POD} -- curl -s -u "${OS_CURL_AUTH}" http://localhost:9200/_cat/indices?format=json 2>/dev/null | jq . || true
   echo "[DEBUG]: OpenSearch cluster health:"
