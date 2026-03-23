@@ -495,7 +495,7 @@ verify_opensearch() {
   echo "[INFO]: Verifying OpenSearch is being used by ${DC_APP}"
 
   OS_POD="opensearch-cluster-master-0"
-  RETRIES=120
+  RETRIES=12
   SLEEP_INTERVAL=5
 
   # First, wait for the OpenSearch pod to be ready
