@@ -498,6 +498,14 @@ verify_opensearch() {
   RETRIES=12
   SLEEP_INTERVAL=5
 
+  # Retrieve OpenSearch admin password from the Kubernetes secret
+  OS_PASSWORD=$(kubectl get secret opensearch-initial-password -n atlassian -o jsonpath='{.data.OPENSEARCH_INITIAL_ADMIN_PASSWORD}' | base64 -d)
+  if [ -z "${OS_PASSWORD}" ]; then
+    echo "[ERROR]: Failed to retrieve OpenSearch admin password from secret 'opensearch-initial-password'"
+    exit 1
+  fi
+  OS_CURL_AUTH="-u admin:${OS_PASSWORD}"
+
   # First, wait for the OpenSearch pod to be ready
   echo "[INFO]: Waiting for OpenSearch pod to be ready"
   kubectl wait --for=condition=ready pod/${OS_POD} -n atlassian --timeout=300s || {
@@ -508,7 +516,7 @@ verify_opensearch() {
 
   for i in $(seq 1 ${RETRIES}); do
     INDICES=$(kubectl exec -n atlassian ${OS_POD} -- \
-      curl -s http://localhost:9200/_cat/indices?format=json 2>/dev/null) || true
+      curl -s "${OS_CURL_AUTH}" http://localhost:9200/_cat/indices?format=json 2>/dev/null) || true
 
     if [ -z "${INDICES}" ] || [ "${INDICES}" = "null" ]; then
       echo "[INFO]: OpenSearch returned empty response, retrying... (${i}/${RETRIES})"
@@ -540,9 +548,9 @@ verify_opensearch() {
 
   echo "[ERROR]: OpenSearch verification failed for ${DC_APP} after $((RETRIES * SLEEP_INTERVAL)) seconds"
   echo "[DEBUG]: OpenSearch indices:"
-  kubectl exec -n atlassian ${OS_POD} -- curl -s http://localhost:9200/_cat/indices?format=json 2>/dev/null | jq . || true
+  kubectl exec -n atlassian ${OS_POD} -- curl -s "${OS_CURL_AUTH}" http://localhost:9200/_cat/indices?format=json 2>/dev/null | jq . || true
   echo "[DEBUG]: OpenSearch cluster health:"
-  kubectl exec -n atlassian ${OS_POD} -- curl -s http://localhost:9200/_cat/health 2>/dev/null || true
+  kubectl exec -n atlassian ${OS_POD} -- curl -s "${OS_CURL_AUTH}" http://localhost:9200/_cat/health 2>/dev/null || true
   exit 1
 }
 
