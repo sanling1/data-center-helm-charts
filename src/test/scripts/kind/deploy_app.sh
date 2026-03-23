@@ -551,6 +551,11 @@ verify_opensearch() {
   kubectl exec -n atlassian ${OS_POD} -- curl -s -u "${OS_CURL_AUTH}" http://localhost:9200/_cat/indices?format=json 2>/dev/null | jq . || true
   echo "[DEBUG]: OpenSearch cluster health:"
   kubectl exec -n atlassian ${OS_POD} -- curl -s -u "${OS_CURL_AUTH}" http://localhost:9200/_cat/health 2>/dev/null || true
+  echo "[DEBUG]: ${DC_APP} pod logs (last 200 lines):"
+  for pod in $(kubectl get pods -n atlassian -l app.kubernetes.io/name=${DC_APP} --no-headers -o custom-columns=":metadata.name" 2>/dev/null); do
+    echo "--- Logs from ${pod} ---"
+    kubectl logs "${pod}" -n atlassian --tail=200 2>/dev/null || true
+  done
   exit 1
 }
 
