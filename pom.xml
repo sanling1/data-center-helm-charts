@@ -55,36 +55,6 @@
             <version>0.4.2</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-client</artifactId>
-            <version>${kubernetes-client.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>3.0.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.1.1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <properties>
@@ -96,9 +66,6 @@
         <assertj.version>3.23.1</assertj.version>
         <vavr.version>0.10.3</vavr.version>
         <jackson.version>2.13.3</jackson.version>
-        <kubernetes-client.version>6.0.0</kubernetes-client.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <commons-io.version>2.14.0</commons-io.version>
 
         <dockerImage.registry />
         <dockerImage.repository />
@@ -198,25 +165,6 @@
             </properties>
         </profile>
 
-        <profile>
-            <id>post-install-tests</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <includes>
-                                <include>test/postinstall/*.java</include>
-                            </includes>
-                            <systemPropertyVariables>
-                                <helmParametersFileLocation>${helmParametersFileLocation}</helmParametersFileLocation>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 
 </project>
