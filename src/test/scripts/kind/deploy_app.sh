@@ -534,14 +534,13 @@ verify_opensearch() {
       echo "[INFO]: Waiting for Bitbucket to create index in OpenSearch... (${i}/${RETRIES})"
 
     elif [ "${DC_APP}" = "jira" ]; then
-      # Jira creates a 'jira-issues-*' index with at least 1 document
-      DOC_COUNT=$(echo "${INDICES}" | jq -r '[.[] | select(.index | test("^jira-issues-"))] | .[0] | .["docs.count"] // empty' 2>/dev/null) || true
-      if [ -n "${DOC_COUNT}" ] && [ "${DOC_COUNT}" != "0" ]; then
-        echo "[INFO]: OpenSearch verification passed for Jira: jira-issues index has docs.count=${DOC_COUNT}"
+      # Jira creates a 'jira-issues-*' index on startup; on a fresh instance it will have 0 documents
+      INDEX_EXISTS=$(echo "${INDICES}" | jq -r '[.[] | select(.index | test("^jira-issues-"))] | length' 2>/dev/null) || true
+      if [ -n "${INDEX_EXISTS}" ] && [ "${INDEX_EXISTS}" != "0" ]; then
+        DOC_COUNT=$(echo "${INDICES}" | jq -r '[.[] | select(.index | test("^jira-issues-"))] | .[0] | .["docs.count"] // "0"' 2>/dev/null) || true
+        echo "[INFO]: OpenSearch verification passed for Jira: jira-issues index exists (docs.count=${DOC_COUNT})"
         return 0
       fi
-      echo "[INFO]: Waiting for Jira to create index in OpenSearch... (${i}/${RETRIES})"
-    fi
 
     sleep ${SLEEP_INTERVAL}
   done
