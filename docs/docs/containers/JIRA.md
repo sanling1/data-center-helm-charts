@@ -221,7 +221,7 @@ information, please refer to
 
 ### OpenSearch configuration
 
-Starting with Jira 11.0, you can configure Jira to use OpenSearch as the search platform.
+Starting with Jira 11.2, you can configure Jira to use OpenSearch as the search platform.
 
 * `ATL_SEARCH_PLATFORM`
 
