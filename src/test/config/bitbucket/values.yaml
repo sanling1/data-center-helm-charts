@@ -27,6 +27,7 @@ bitbucket:
   additionalJvmArgs:
     - -Dfeature.getting.started.page=false
     - -Dupm.plugin.upload.enabled=true
+    - -Datlassian.authentication.legacy.mode=true
     - -XX:ActiveProcessorCount=2
   resources:
     container:
