@@ -25,6 +25,7 @@ bitbucket:
   sysadminCredentials:
     secretName: bitbucket-sysadmin-credentials
   additionalJvmArgs:
+    - -Dcom.atlassian.plugins.authentication.basic.auth.filter.force.allow=true
     - -Dfeature.getting.started.page=false
     - -Dupm.plugin.upload.enabled=true
     - -XX:ActiveProcessorCount=2
