@@ -20,8 +20,8 @@ deprecated: false
 annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |-
-    - "Add Gateway API support via HTTPRoute resources"
-    - "Gateway API provides modern alternative to Ingress"
+    - "DEVPROD-3580: Add gateway api support (#1084)"
+    - "Update appVersions for DC apps (#1100)"
 dependencies:
 - name: common
   version: 1.2.7

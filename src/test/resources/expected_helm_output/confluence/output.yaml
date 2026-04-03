@@ -599,6 +599,7 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/config-jvm: 5c7e4f3183d49bd4e8c82a29b06246e551e4120042495652f1f9b27a0599a882
       labels:
         helm.sh/chart: confluence-2.0.10
         app.kubernetes.io/name: confluence-synchrony
@@ -683,6 +684,7 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/config-jvm: 4cd9374e3a0de5d16524855ad1431936f2fd8cd58ffe8dfd797a209ad108b988
       labels:
         helm.sh/chart: confluence-2.0.10
         app.kubernetes.io/name: confluence

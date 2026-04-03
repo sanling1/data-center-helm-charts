@@ -20,7 +20,8 @@ deprecated: false
 annotations:
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |-
-    - "Add Gateway API support via HTTPRoute resources"
+    - "DEVPROD-3580: Add gateway api support (#1084)"
+    - "DCDORA-2747 Use OpenSearch 3.5.0 for Confluence (#1092)"
 
 dependencies:
 - name: common
