@@ -108,15 +108,15 @@ podAnnotations:
   quote: "true"
   normal: annotation-comes-here
 
-# KinD is deployed with custom settings, namely extraPortMappings for ports 80 and 443
-# to make sure ingress traffic is available at http://localhost
-ingress:
+# KinD tests use Gateway API with Envoy Gateway.
+# Envoy proxy is exposed via NodePort(30080) -> hostPort(80); dc-app.test resolves via /etc/hosts.
+gateway:
   create: true
-  host: localhost
+  parentRefs:
+    - name: atlassian-gateway
+  hostnames:
+    - dc-app.test
   https: false
-  proxyConnectTimeout: 300
-  proxyReadTimeout: 300
-  proxySendTimeout: 300
 
 monitoring:
   exposeJmxMetrics: true
