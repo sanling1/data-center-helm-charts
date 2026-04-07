@@ -2,7 +2,7 @@ apiVersion: v2
 name: confluence
 description: A chart for installing Confluence Data Center on Kubernetes
 type: application
-version: '2.0.10'
+version: '2.0.11'
 appVersion: 10.2.8
 kubeVersion: ">=1.21.x-0"
 keywords:
@@ -20,8 +20,7 @@ deprecated: false
 annotations:
   artifacthub.io/containsSecurityUpdates: "true"
   artifacthub.io/changes: |-
-    - "DEVPROD-3580: Add gateway api support (#1084)"
-    - "DCDORA-2747 Use OpenSearch 3.5.0 for Confluence (#1092)"
+    - "Update appVersions for DC apps (#1107)"
 
 dependencies:
 - name: common

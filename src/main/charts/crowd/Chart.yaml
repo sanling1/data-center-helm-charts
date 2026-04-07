@@ -2,7 +2,7 @@ apiVersion: v2
 name: crowd
 description: A chart for installing Crowd Data Center on Kubernetes
 type: application
-version: '2.0.10'
+version: '2.0.11'
 appVersion: 7.1.5
 
 kubeVersion: ">=1.21.x-0"
@@ -21,8 +21,7 @@ deprecated: false
 annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/changes: |-
-    - "DEVPROD-3580: Add gateway api support (#1084)"
-    - "Update appVersions for DC apps (#1100)"
+    - "Update Helm chart version"
 
 dependencies:
 - name: common
